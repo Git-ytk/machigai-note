@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>まちがいノート📒</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap');
+
+:root {
+  --bg: #0f0c1a;
+  --surface: #1a1628;
+  --surface2: #231d35;
+  --border: #2e2845;
+  --primary: #f97316;
+  --primary-glow: rgba(249,115,22,0.25);
+  --accent: #22d3ee;
+  --accent-glow: rgba(34,211,238,0.2);
+  --green: #4ade80;
+  --green-glow: rgba(74,222,128,0.2);
+  --yellow: #fbbf24;
+  --purple: #a78bfa;
+  --text: #f0eaff;
+  --text-muted: #7c6f9e;
+  --radius: 16px;
+  --font: 'Zen Maru Gothic', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(167,139,250,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(249,115,22,0.06) 0%, transparent 60%);
+}
+
+/* ── HEADER ── */
+.header {
+  padding: 18px 20px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(15,12,26,0.92);
+  backdrop-filter: blur(12px);
+}
+.header-logo { font-family: 'Kaisei Decol', serif; font-size: 22px; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
+.header-logo span { color: var(--text); }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.level-badge {
+  background: linear-gradient(135deg, var(--purple), var(--primary));
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 13px; font-weight: 900; color: white;
+  box-shadow: 0 0 16px var(--primary-glow);
+}
+.sync-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── NAV ── */
+.nav {
+  display: flex; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  flex: 1; min-width: 64px; padding: 12px 4px 10px;
+  border: none; background: none; cursor: pointer;
+  font-family: var(--font); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.nav-btn .icon { font-size: 22px; }
+.nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.nav-badge {
+  background: var(--primary); color: white;
+  border-radius: 10px; font-size: 10px; font-weight: 900;
+  padding: 1px 6px; min-width: 18px; text-align: center;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 32px; }
+.screen.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 14px;
+}
+.card-glow-orange { box-shadow: 0 0 0 1px var(--border), 0 4px 24px var(--primary-glow); }
+.card-glow-cyan { box-shadow: 0 0 0 1px var(--border), 0 4px 24px var(--accent-glow); }
+
+/* ── XP BAR ── */
+.xp-section { margin-bottom: 16px; }
+.xp-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.xp-label { font-size: 13px; color: var(--text-muted); font-weight: 700; }
+.xp-val { font-size: 13px; color: var(--purple); font-weight: 900; }
+.xp-track { background: var(--surface2); border-radius: 8px; height: 10px; overflow: hidden; }
+.xp-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--purple), var(--primary)); transition: width 0.8s cubic-bezier(.34,1.56,.64,1); }
+
+/* ── UPLOAD ── */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 32px 20px; text-align: center; cursor: pointer;
+  background: var(--surface2); transition: all 0.2s; position: relative;
+}
+.upload-zone:hover { border-color: var(--primary); background: rgba(249,115,22,0.05); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-icon { font-size: 44px; margin-bottom: 8px; }
+.upload-text { font-size: 15px; font-weight: 700; color: var(--text); }
+.upload-sub { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+.camera-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 15px; background: linear-gradient(135deg, #0e7490, #0284c7);
+  color: white; border: none; border-radius: var(--radius);
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-top: 10px; transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(6,182,212,0.3);
+}
+.camera-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,182,212,0.4); }
+#cameraInput { display: none; }
+#previewImg {
+  width: 100%; border-radius: 12px; max-height: 260px;
+  object-fit: contain; background: var(--surface2);
+  display: none; margin: 12px 0;
+  border: 1px solid var(--border);
+}
+
+/* ── LOADING ── */
+.loading-box { display:none; text-align:center; padding:24px; background:var(--surface2); border-radius:var(--radius); margin:12px 0; }
+.loading-box.show { display:block; }
+.spinner { width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.loading-txt { font-size:14px;font-weight:700;color:var(--primary); }
+.loading-sub { font-size:12px;color:var(--text-muted);margin-top:4px; }
+
+/* ── AI RESULT ── */
+.ai-result { display:none; border-left:3px solid var(--accent); background:rgba(34,211,238,0.06); border-radius:0 12px 12px 0; padding:16px; margin:12px 0; }
+.ai-result.show { display:block; }
+.ai-result-title { font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1px; }
+.ai-result-text { font-size:14px;line-height:1.85;color:var(--text);white-space:pre-wrap; }
+
+/* ── FORM ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:8px;display:block; }
+.form-input,.form-select,.form-textarea {
+  width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;
+  font-family:var(--font);font-size:14px;color:var(--text);
+  background:var(--surface2);transition:border-color 0.2s;outline:none;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--primary); }
+.form-textarea { resize:vertical;min-height:70px; }
+.form-select option { background:var(--surface2); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding:13px 22px;border:none;border-radius:12px;
+  font-family:var(--font);font-size:14px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary { background:linear-gradient(135deg,#ea580c,#f97316);color:white;box-shadow:0 4px 16px var(--primary-glow); }
+.btn-primary:hover { transform:translateY(-2px);box-shadow:0 6px 20px var(--primary-glow); }
+.btn-primary:disabled { opacity:0.4;cursor:not-allowed;transform:none; }
+.btn-green { background:linear-gradient(135deg,#16a34a,#4ade80);color:#0f2419;box-shadow:0 4px 16px var(--green-glow); }
+.btn-green:hover { transform:translateY(-2px); }
+.btn-outline { background:transparent;color:var(--primary);border:1.5px solid var(--primary); }
+.btn-outline:hover { background:rgba(249,115,22,0.1); }
+.btn-ghost { background:var(--surface2);color:var(--text);border:1px solid var(--border); }
+.btn-ghost:hover { border-color:var(--text-muted); }
+.btn-danger { background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3); }
+.btn-full { width:100%;justify-content:center; }
+.btn-sm { padding:8px 14px;font-size:13px;border-radius:10px; }
+
+/* ── SECTION TITLE ── */
+.section-title { font-family:'Kaisei Decol',serif;font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text); }
+
+/* ── PROBLEM CARDS ── */
+.problem-card {
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:15px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;
+}
+.problem-card:hover { border-color:var(--primary);transform:translateY(-2px);box-shadow:0 4px 20px var(--primary-glow); }
+.problem-card.cleared { border-color:var(--green);opacity:0.7; }
+.problem-card.cleared:hover { opacity:1; }
+.problem-header { display:flex;align-items:flex-start;justify-content:space-between;gap:12px; }
+.problem-title { font-size:15px;font-weight:700;flex:1;line-height:1.4; }
+.problem-img-thumb { width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex-shrink:0; }
+.problem-meta { display:flex;gap:6px;flex-wrap:wrap;margin-top:8px; }
+.tag { font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px; }
+.tag-subject { background:rgba(249,115,22,0.15);color:var(--primary); }
+.tag-cleared { background:rgba(74,222,128,0.15);color:var(--green); }
+.tag-review { background:rgba(251,191,36,0.15);color:var(--yellow); }
+.tag-date { background:var(--surface2);color:var(--text-muted); }
+.review-count { font-size:12px;color:var(--text-muted);margin-top:6px;display:flex;align-items:center;gap:4px; }
+
+/* ── FILTER ── */
+.filter-row { display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none; }
+.filter-row::-webkit-scrollbar { display:none; }
+.filter-chip {
+  padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--surface);font-family:var(--font);font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:all 0.2s;color:var(--text-muted);
+}
+.filter-chip.active { background:var(--primary);color:white;border-color:var(--primary); }
+
+/* ── MODAL ── */
+.modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px); }
+.modal-overlay.show { display:flex; }
+.modal {
+  background:var(--surface);border-radius:24px 24px 0 0;
+  width:100%;max-width:600px;max-height:90vh;overflow-y:auto;
+  padding:20px 20px 40px;animation:slideUp 0.3s ease;border-top:1px solid var(--border);
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px; }
+.modal-title { font-family:'Kaisei Decol',serif;font-size:20px;font-weight:700;margin-bottom:14px; }
+.modal-img { width:100%;border-radius:12px;max-height:280px;object-fit:contain;background:var(--surface2);margin-bottom:14px;border:1px solid var(--border); }
+.modal-explanation { background:rgba(34,211,238,0.06);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:14px;font-size:14px;line-height:1.85;white-space:pre-wrap;margin-bottom:14px; }
+.modal-memo { background:rgba(251,191,36,0.08);border-radius:12px;padding:12px;font-size:14px;line-height:1.7;margin-bottom:14px;white-space:pre-wrap;border:1px solid rgba(251,191,36,0.2); }
+.modal-section-label { font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:1px; }
+.modal-actions { display:flex;gap:8px;flex-wrap:wrap; }
+
+/* ── REVIEW SCREEN ── */
+.review-empty { text-align:center;padding:48px 20px;color:var(--text-muted); }
+.review-empty .big-icon { font-size:64px;margin-bottom:16px; }
+.review-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px; }
+.review-card-header { background:linear-gradient(135deg,#ea580c,#f97316);padding:12px 16px;font-weight:700;font-size:14px;display:flex;justify-content:space-between; }
+.review-card-body { padding:16px; }
+.review-card-img { width:100%;border-radius:10px;max-height:240px;object-fit:contain;background:var(--surface2);margin-bottom:14px;border:1px solid var(--border); }
+.answer-toggle {
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:13px;background:rgba(251,191,36,0.1);border:1.5px dashed rgba(251,191,36,0.4);
+  border-radius:12px;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;
+  color:var(--yellow);transition:all 0.2s;margin-bottom:12px;
+}
+.answer-toggle:hover { background:rgba(251,191,36,0.18); }
+.answer-content { display:none; }
+.answer-content.show { display:block; }
+.review-buttons { display:flex;gap:8px; }
+
+/* AI QUIZ */
+.quiz-box { background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px; }
+.quiz-question { font-size:15px;font-weight:700;line-height:1.6;margin-bottom:14px; }
+.quiz-options { display:flex;flex-direction:column;gap:8px; }
+.quiz-option {
+  padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);
+  cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;
+  background:var(--surface);color:var(--text);transition:all 0.2s;text-align:left;
+}
+.quiz-option:hover:not(:disabled) { border-color:var(--primary);background:rgba(249,115,22,0.08); }
+.quiz-option.correct { border-color:var(--green);background:rgba(74,222,128,0.15);color:var(--green); }
+.quiz-option.wrong { border-color:#f87171;background:rgba(239,68,68,0.1);color:#f87171; }
+.quiz-option:disabled { cursor:default; }
+.quiz-result { padding:12px;border-radius:10px;margin-top:10px;font-size:14px;font-weight:700;line-height:1.7;display:none; }
+.quiz-result.show { display:block; }
+.quiz-result.correct-msg { background:rgba(74,222,128,0.12);color:var(--green);border:1px solid rgba(74,222,128,0.3); }
+.quiz-result.wrong-msg { background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2); }
+
+/* CALENDAR */
+.cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:4px; }
+.cal-header { display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px; }
+.cal-day-label { text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);padding:4px 0; }
+.cal-cell {
+  aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;position:relative;cursor:default;transition:all 0.2s;
+  background:var(--surface2);color:var(--text-muted);
+}
+.cal-cell.has-wrong { background:rgba(249,115,22,0.2);color:var(--primary);cursor:pointer; }
+.cal-cell.has-wrong:hover { background:rgba(249,115,22,0.35);transform:scale(1.1); }
+.cal-cell.has-cleared { background:rgba(74,222,128,0.15);color:var(--green); }
+.cal-cell.today { box-shadow:0 0 0 2px var(--accent); }
+.cal-cell.other-month { opacity:0.3; }
+.cal-dot { position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--primary); }
+.cal-nav { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+.cal-nav-title { font-weight:900;font-size:16px; }
+.cal-nav-btn { background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:16px; }
+
+/* STATS */
+.stat-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
+.stat-box { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center; }
+.stat-number { font-family:'Kaisei Decol',serif;font-size:36px;font-weight:700;color:var(--primary); }
+.stat-label { font-size:12px;color:var(--text-muted);margin-top:4px;font-weight:700; }
+.subject-bar { margin-bottom:12px; }
+.subject-bar-label { display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px; }
+.bar-track { background:var(--surface2);border-radius:8px;height:8px;overflow:hidden; }
+.bar-fill { height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--primary));transition:width 0.8s ease; }
+
+/* BADGES */
+.badges-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px; }
+.badge-item {
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 8px;text-align:center;transition:all 0.2s;
+}
+.badge-item.earned { border-color:var(--yellow);background:rgba(251,191,36,0.08);box-shadow:0 0 16px rgba(251,191,36,0.15); }
+.badge-icon { font-size:28px;margin-bottom:6px;display:block;filter:grayscale(1);opacity:0.3; }
+.badge-item.earned .badge-icon { filter:none;opacity:1; }
+.badge-name { font-size:10px;font-weight:700;color:var(--text-muted);line-height:1.3; }
+.badge-item.earned .badge-name { color:var(--yellow); }
+
+/* REMINDER */
+.reminder-box { background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.3);border-radius:var(--radius);padding:16px;margin-bottom:14px; }
+.reminder-title { font-size:13px;font-weight:700;color:var(--purple);margin-bottom:10px; }
+.reminder-problem { display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface2);border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all 0.2s; }
+.reminder-problem:hover { background:var(--border); }
+
+/* TOAST */
+.toast {
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  padding:12px 22px;border-radius:24px;font-size:14px;font-weight:700;
+  opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;
+  box-shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+.toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+/* SYNC BANNER */
+.sync-banner {
+  background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);
+  border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;
+  color:var(--green);display:flex;align-items:center;gap:8px;margin-bottom:14px;
+}
+.sync-banner.error { background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171; }
+
+/* LEVEL UP OVERLAY */
+.levelup-overlay {
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.8);align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.levelup-overlay.show { display:flex; }
+.levelup-box {
+  background:var(--surface);border:1px solid var(--yellow);border-radius:24px;
+  padding:40px 32px;text-align:center;animation:popIn 0.5s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 0 60px rgba(251,191,36,0.3);max-width:320px;width:90%;
+}
+@keyframes popIn { from{transform:scale(0.6);opacity:0} to{transform:scale(1);opacity:1} }
+.levelup-icon { font-size:72px;margin-bottom:12px;animation:bounce 1s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.levelup-title { font-family:'Kaisei Decol',serif;font-size:28px;font-weight:700;color:var(--yellow);margin-bottom:8px; }
+.levelup-sub { font-size:15px;color:var(--text-muted); }
+
+.empty-msg { text-align:center;padding:32px;color:var(--text-muted);font-size:14px; }
+
+/* ROOM CODE */
+.room-code-box { background:var(--surface2);border-radius:12px;padding:12px;text-align:center;margin-bottom:12px; }
+.room-code { font-family:'Kaisei Decol',serif;font-size:28px;font-weight:700;color:var(--accent);letter-spacing:6px; }
+.room-code-label { font-size:12px;color:var(--text-muted);margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">まちが<span>いノート</span>📒</div>
+  </div>
+  <div class="header-right">
+    <div class="level-badge" id="levelBadge">Lv.1</div>
+    <div class="sync-dot" id="syncDot" title="同期状態"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('add')" id="nav-add"><span class="icon">📷</span>とりこむ</button>
+  <button class="nav-btn" onclick="showScreen('list')" id="nav-list"><span class="icon">📋</span>もんだい</button>
+  <button class="nav-btn" onclick="showScreen('review')" id="nav-review"><span class="icon">🔄</span>ふくしゅう<span class="nav-badge" id="reviewBadge" style="display:none">0</span></button>
+  <button class="nav-btn" onclick="showScreen('calendar')" id="nav-calendar"><span class="icon">📅</span>カレンダー</button>
+  <button class="nav-btn" onclick="showScreen('stats')" id="nav-stats"><span class="icon">🏆</span>せいせき</button>
+  <button class="nav-btn" onclick="showScreen('sync')" id="nav-sync"><span class="icon">☁️</span>どうき</button>
+</nav>
+
+<!-- ADD SCREEN -->
+<div class="screen active" id="screen-add">
+
+  <div id="reminderSection"></div>
+
+  <div class="card card-glow-orange">
+    <div class="section-title">📷 問題を取り込む</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept="image/*" id="fileInput" onchange="handleFile(this)">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-text">画像をここにドロップ</div>
+      <div class="upload-sub">またはタップしてファイルを選択</div>
+    </div>
+    <button class="camera-btn" onclick="document.getElementById('cameraInput').click()">
+      📸 カメラで撮影する
+    </button>
+    <input type="file" accept="image/*" capture="environment" id="cameraInput" onchange="handleFile(this)">
+    <img id="previewImg" alt="プレビュー">
+    <div class="loading-box" id="loadingBox">
+      <div class="spinner"></div>
+      <div class="loading-txt">AIが問題を読み取り中…</div>
+      <div class="loading-sub">図形・グラフも認識できます</div>
+    </div>
+    <div class="ai-result" id="aiResult">
+      <div class="ai-result-title">✦ AIの解説</div>
+      <div class="ai-result-text" id="aiResultText"></div>
+    </div>
+  </div>
+
+  <div class="card" id="formCard" style="display:none">
+    <div class="form-group">
+      <label class="form-label">📚 教科</label>
+      <select class="form-select" id="subjectInput">
+        <option>算数</option><option>国語</option><option>理科</option>
+        <option>社会</option><option>英語</option><option>その他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">📝 問題タイトル</label>
+      <input type="text" class="form-input" id="titleInput" placeholder="例：三角形の面積の問題">
+    </div>
+    <div class="form-group">
+      <label class="form-label">💭 自分のメモ（任意）</label>
+      <textarea class="form-textarea" id="memoInput" placeholder="どこで間違えたか、気をつけることなど…"></textarea>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="saveProblem()">
+      💾 まちがいノートに保存する
+    </button>
+  </div>
+</div>
+
+<!-- LIST SCREEN -->
+<div class="screen" id="screen-list">
+  <div class="section-title">📋 ストック中の問題</div>
+  <div class="filter-row" id="filterRow">
+    <button class="filter-chip active" onclick="filterProblems('all', this)">すべて</button>
+    <button class="filter-chip" onclick="filterProblems('未クリア', this)">⏳ 未クリア</button>
+    <button class="filter-chip" onclick="filterProblems('クリア', this)">✅ クリア済</button>
+    <button class="filter-chip" onclick="filterProblems('算数', this)">算数</button>
+    <button class="filter-chip" onclick="filterProblems('国語', this)">国語</button>
+    <button class="filter-chip" onclick="filterProblems('理科', this)">理科</button>
+    <button class="filter-chip" onclick="filterProblems('社会', this)">社会</button>
+  </div>
+  <div id="problemList"></div>
+</div>
+
+<!-- REVIEW SCREEN -->
+<div class="screen" id="screen-review">
+  <div class="section-title">🔄 ふくしゅうタイム</div>
+  <div id="reviewContent"></div>
+</div>
+
+<!-- CALENDAR SCREEN -->
+<div class="screen" id="screen-calendar">
+  <div class="section-title">📅 カレンダー</div>
+  <div class="card">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="cal-nav-title" id="calTitle"></div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-header" id="calHeader"></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div style="display:flex;gap:16px;margin-top:14px;font-size:12px;font-weight:700">
+      <span><span style="color:var(--primary)">●</span> まちがえた日</span>
+      <span><span style="color:var(--green)">●</span> クリアした日</span>
+    </div>
+  </div>
+  <div id="calDayDetail"></div>
+</div>
+
+<!-- STATS SCREEN -->
+<div class="screen" id="screen-stats">
+  <div class="section-title">🏆 せいせき・バッジ</div>
+
+  <div class="xp-section card">
+    <div class="xp-row">
+      <span class="xp-label" id="levelLabel">Lv.1 見習い探偵</span>
+      <span class="xp-val" id="xpLabel">0 / 100 XP</span>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-title" style="margin-top:4px">🏅 バッジ</div>
+  <div class="badges-grid" id="badgesGrid"></div>
+
+  <div class="section-title">📊 統計</div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">📚 教科別まちがい数</div>
+    <div id="subjectBars"></div>
+  </div>
+</div>
+
+<!-- SYNC SCREEN -->
+<div class="screen" id="screen-sync">
+  <div class="section-title">☁️ データ共有・同期</div>
+  <div id="syncStatus"></div>
+  <div class="card card-glow-cyan">
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px">🔑 ルームコードで共有</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">
+      同じルームコードを使うと、複数のデバイス（スマホ・タブレット・PC）でデータを共有できます。
+    </div>
+    <div class="room-code-box">
+      <div class="room-code" id="roomCodeDisplay">------</div>
+      <div class="room-code-label">現在のルームコード</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input type="text" class="form-input" id="roomCodeInput" placeholder="コードを入力して参加" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;text-align:center">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="joinRoom()">🔗 このコードで参加</button>
+      <button class="btn btn-ghost btn-sm" onclick="newRoom()">🆕 新しいコードを作成</button>
+      <button class="btn btn-primary btn-sm" onclick="syncNow()">☁️ 今すぐ同期</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px">📤 データのバックアップ</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇️ JSONエクスポート</button>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+        ⬆️ JSONインポート
+        <input type="file" accept=".json" onchange="importData(this)" style="display:none">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- LEVEL UP OVERLAY -->
+<div class="levelup-overlay" id="levelupOverlay" onclick="this.classList.remove('show')">
+  <div class="levelup-box">
+    <div class="levelup-icon">🎉</div>
+    <div class="levelup-title" id="levelupTitle">レベルアップ！</div>
+    <div class="levelup-sub" id="levelupSub">Lv.2 になった！</div>
+    <button class="btn btn-primary" style="margin-top:20px;width:100%;justify-content:center" onclick="document.getElementById('levelupOverlay').classList.remove('show')">やった！</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA & STATE
+// ══════════════════════════════════════════
+let problems = JSON.parse(localStorage.getItem('mk_problems') || '[]');
+let roomCode = localStorage.getItem('mk_room') || '';
+let calMonth = new Date();
+let currentFilter = 'all';
+let isSyncing = false;
+
+const LEVELS = [
+  {min:0,   name:'見習い探偵',   icon:'🔍'},
+  {min:50,  name:'問題ハンター', icon:'🎯'},
+  {min:150, name:'算数の勇者',   icon:'⚔️'},
+  {min:300, name:'解法マスター', icon:'🧙'},
+  {min:500, name:'まちがい王',   icon:'👑'},
+  {min:800, name:'天才チャレンジャー', icon:'🚀'},
+];
+
+const BADGES = [
+  {id:'first',   icon:'🌟', name:'はじめの一歩', desc:'最初の問題を保存'},
+  {id:'five',    icon:'🎯', name:'5問クリア',    desc:'5問クリア'},
+  {id:'ten',     icon:'🔥', name:'10問クリア',   desc:'10問クリア'},
+  {id:'twenty',  icon:'💎', name:'20問クリア',   desc:'20問クリア'},
+  {id:'review5', icon:'🔄', name:'5回ふくしゅう', desc:'合計5回ふくしゅう'},
+  {id:'streak3', icon:'📅', name:'3日連続',      desc:'3日連続でふくしゅう'},
+  {id:'math10',  icon:'📐', name:'算数マスター',  desc:'算数10問クリア'},
+  {id:'allsub',  icon:'🌈', name:'全教科制覇',    desc:'全教科で問題をクリア'},
+];
+
+function calcXP() {
+  const cleared = problems.filter(p => p.status === 'クリア').length;
+  const reviews = problems.reduce((s, p) => s + (p.reviewCount || 0), 0);
+  return cleared * 20 + reviews * 3 + problems.length * 2;
+}
+
+function getLevelData(xp) {
+  let lvl = 0;
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].min) { lvl = i; break; }
+  }
+  const next = LEVELS[lvl + 1];
+  const pct = next ? Math.round((xp - LEVELS[lvl].min) / (next.min - LEVELS[lvl].min) * 100) : 100;
+  return { level: lvl + 1, name: LEVELS[lvl].name, icon: LEVELS[lvl].icon, xp, nextMin: next?.min || xp, pct };
+}
+
+function checkBadges(oldXP) {
+  const earned = JSON.parse(localStorage.getItem('mk_badges') || '[]');
+  const cleared = problems.filter(p => p.status === 'クリア').length;
+  const reviews = problems.reduce((s, p) => s + (p.reviewCount || 0), 0);
+  const mathCleared = problems.filter(p => p.subject === '算数' && p.status === 'クリア').length;
+  const subs = new Set(problems.filter(p => p.status === 'クリア').map(p => p.subject));
+  const allSubs = ['算数','国語','理科','社会'].every(s => subs.has(s));
+  const newEarned = [];
+  const check = (id, cond) => { if (cond && !earned.includes(id)) { earned.push(id); newEarned.push(id); } };
+  check('first', problems.length >= 1);
+  check('five', cleared >= 5);
+  check('ten', cleared >= 10);
+  check('twenty', cleared >= 20);
+  check('review5', reviews >= 5);
+  check('math10', mathCleared >= 10);
+  check('allsub', allSubs);
+  if (newEarned.length) { localStorage.setItem('mk_badges', JSON.stringify(earned)); newEarned.forEach(id => { const b = BADGES.find(x => x.id === id); showToast('🏅 バッジ獲得：' + b.name); }); }
+  const oldLvl = getLevelData(oldXP).level;
+  const newLvl = getLevelData(calcXP()).level;
+  if (newLvl > oldLvl) {
+    const ld = getLevelData(calcXP());
+    document.getElementById('levelupTitle').textContent = 'レベルアップ！';
+    document.getElementById('levelupSub').textContent = ld.icon + ' Lv.' + ld.level + ' 「' + ld.name + '」 になった！';
+    document.getElementById('levelupOverlay').classList.add('show');
+  }
+  updateLevelUI();
+}
+
+function updateLevelUI() {
+  const xp = calcXP();
+  const ld = getLevelData(xp);
+  document.getElementById('levelBadge').textContent = 'Lv.' + ld.level;
+  document.getElementById('levelLabel').textContent = 'Lv.' + ld.level + ' ' + ld.icon + ' ' + ld.name;
+  document.getElementById('xpLabel').textContent = xp + ' / ' + ld.nextMin + ' XP';
+  document.getElementById('xpFill').style.width = ld.pct + '%';
+  const pending = problems.filter(p => p.status !== 'クリア').length;
+  const rb = document.getElementById('reviewBadge');
+  rb.textContent = pending; rb.style.display = pending ? 'inline-block' : 'none';
+}
+updateLevelUI();
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'list') renderList();
+  if (name === 'review') renderReview();
+  if (name === 'calendar') renderCalendar();
+  if (name === 'stats') renderStats();
+  if (name === 'sync') renderSync();
+  if (name === 'add') renderReminder();
+}
+
+// ══════════════════════════════════════════
+// FILE HANDLING
+// ══════════════════════════════════════════
+let currentImage = null;
+
+function handleFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    currentImage = e.target.result;
+    document.getElementById('previewImg').src = currentImage;
+    document.getElementById('previewImg').style.display = 'block';
+    analyzeWithAI();
+  };
+  reader.readAsDataURL(file);
+}
+
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; });
+zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file?.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      currentImage = ev.target.result;
+      document.getElementById('previewImg').src = currentImage;
+      document.getElementById('previewImg').style.display = 'block';
+      analyzeWithAI();
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ══════════════════════════════════════════
+// AI ANALYSIS
+// ══════════════════════════════════════════
+async function analyzeWithAI() {
+  document.getElementById('loadingBox').classList.add('show');
+  document.getElementById('aiResult').classList.remove('show');
+  document.getElementById('formCard').style.display = 'none';
+  const base64 = currentImage.split(',')[1];
+  const mediaType = currentImage.split(';')[0].split(':')[1];
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `あなたは小学5年生の家庭教師です。問題画像を分析し、以下のJSONのみを返してください。他の文章は不要です。
+{"title":"問題タイトル（15文字以内）","subject":"算数・国語・理科・社会・英語・その他のどれか","explanation":"小学5年生向けの解説（ポイントと解き方のコツを含む、300字程度）"}`,
+        messages: [{role:'user', content:[
+          {type:'image', source:{type:'base64', media_type:mediaType, data:base64}},
+          {type:'text', text:'この問題を分析してJSONで返してください。'}
+        ]}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(c => c.text||'').join('');
+    let parsed;
+    try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
+    catch { parsed = {title:'取り込んだ問題', subject:'算数', explanation:text}; }
+    document.getElementById('aiResultText').textContent = parsed.explanation;
+    document.getElementById('aiResult').classList.add('show');
+    document.getElementById('titleInput').value = parsed.title || '';
+    const opts = ['算数','国語','理科','社会','英語','その他'];
+    const idx = opts.indexOf(parsed.subject);
+    if (idx >= 0) document.getElementById('subjectInput').selectedIndex = idx;
+    document.getElementById('formCard').style.display = 'block';
+  } catch {
+    document.getElementById('aiResultText').textContent = '読み取りに失敗しました。もう一度試してみてください。';
+    document.getElementById('aiResult').classList.add('show');
+    document.getElementById('titleInput').value = '取り込んだ問題';
+    document.getElementById('formCard').style.display = 'block';
+  }
+  document.getElementById('loadingBox').classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+// SAVE
+// ══════════════════════════════════════════
+function saveData() {
+  localStorage.setItem('mk_problems', JSON.stringify(problems));
+  updateLevelUI();
+  if (roomCode) syncToCloud();
+}
+
+async function saveProblem() {
+  const oldXP = calcXP();
+  const problem = {
+    id: Date.now(),
+    title: document.getElementById('titleInput').value.trim() || '無題の問題',
+    subject: document.getElementById('subjectInput').value,
+    memo: document.getElementById('memoInput').value.trim(),
+    explanation: document.getElementById('aiResultText').textContent,
+    image: currentImage,
+    status: '未クリア',
+    reviewCount: 0,
+    createdAt: new Date().toISOString().split('T')[0],
+    clearedAt: null
+  };
+  problems.unshift(problem);
+  saveData();
+  checkBadges(oldXP);
+  showToast('💾 保存しました！ +2 XP');
+  currentImage = null;
+  document.getElementById('previewImg').style.display = 'none';
+  document.getElementById('aiResult').classList.remove('show');
+  document.getElementById('formCard').style.display = 'none';
+  ['titleInput','memoInput','fileInput','cameraInput'].forEach(id => { document.getElementById(id).value = ''; });
+}
+
+// ══════════════════════════════════════════
+// LIST
+// ══════════════════════════════════════════
+function filterProblems(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const container = document.getElementById('problemList');
+  let filtered = problems;
+  if (currentFilter === '未クリア') filtered = problems.filter(p => p.status !== 'クリア');
+  else if (currentFilter === 'クリア') filtered = problems.filter(p => p.status === 'クリア');
+  else if (currentFilter !== 'all') filtered = problems.filter(p => p.subject === currentFilter);
+  if (!filtered.length) { container.innerHTML = '<div class="empty-msg">📭 問題がありません</div>'; return; }
+  container.innerHTML = filtered.map(p => `
+    <div class="problem-card ${p.status==='クリア'?'cleared':''}" onclick="openModal(${p.id})">
+      <div class="problem-header">
+        <div style="flex:1">
+          <div class="problem-title">${p.title}</div>
+          <div class="problem-meta">
+            <span class="tag tag-subject">${p.subject}</span>
+            <span class="tag ${p.status==='クリア'?'tag-cleared':'tag-review'}">${p.status==='クリア'?'✅ クリア':'⏳ 未クリア'}</span>
+            <span class="tag tag-date">${p.createdAt}</span>
+          </div>
+          <div class="review-count">🔄 ${p.reviewCount}回ふくしゅう済み</div>
+        </div>
+        ${p.image?`<img src="${p.image}" class="problem-img-thumb" alt="">`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════
+function openModal(id) {
+  const p = problems.find(x => x.id === id); if (!p) return;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-title">${p.title}</div>
+    ${p.image?`<img src="${p.image}" class="modal-img" alt="">`:''}
+    <div class="problem-meta" style="margin-bottom:14px">
+      <span class="tag tag-subject">${p.subject}</span>
+      <span class="tag ${p.status==='クリア'?'tag-cleared':'tag-review'}">${p.status==='クリア'?'✅ クリア':'⏳ 未クリア'}</span>
+      <span class="tag tag-date">${p.createdAt}</span>
+    </div>
+    ${p.explanation?`<div class="modal-section-label">AIの解説</div><div class="modal-explanation">${p.explanation}</div>`:''}
+    ${p.memo?`<div class="modal-section-label">自分のメモ</div><div class="modal-memo">${p.memo}</div>`:''}
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">🔄 ${p.reviewCount}回ふくしゅう済み</div>
+    <div class="modal-actions">
+      ${p.status!=='クリア'
+        ?`<button class="btn btn-green btn-sm" onclick="markCleared(${p.id})">✅ クリアにする</button>`
+        :`<button class="btn btn-outline btn-sm" onclick="markUnclear(${p.id})">↩ 未クリアに戻す</button>`}
+      <button class="btn btn-danger btn-sm" onclick="deleteProblem(${p.id})">🗑 削除</button>
+    </div>`;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('show');
+    renderList();
+  }
+}
+
+function markCleared(id) {
+  const oldXP = calcXP();
+  const p = problems.find(x => x.id === id);
+  if (p) { p.status = 'クリア'; p.clearedAt = new Date().toISOString().split('T')[0]; saveData(); }
+  checkBadges(oldXP);
+  document.getElementById('modal').classList.remove('show');
+  showToast('🎉 クリアおめでとう！ +20 XP');
+}
+function markUnclear(id) {
+  const p = problems.find(x => x.id === id);
+  if (p) { p.status = '未クリア'; p.clearedAt = null; saveData(); }
+  document.getElementById('modal').classList.remove('show');
+}
+function deleteProblem(id) {
+  if (!confirm('この問題を削除しますか？')) return;
+  problems = problems.filter(x => x.id !== id);
+  saveData();
+  document.getElementById('modal').classList.remove('show');
+  showToast('🗑 削除しました');
+}
+
+// ══════════════════════════════════════════
+// REVIEW + AI QUIZ
+// ══════════════════════════════════════════
+function renderReview() {
+  const container = document.getElementById('reviewContent');
+  const list = problems.filter(p => p.status !== 'クリア').sort((a,b) => (a.reviewCount||0)-(b.reviewCount||0));
+  if (!list.length) {
+    container.innerHTML = `<div class="review-empty"><div class="big-icon">🎉</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">すべてクリア！</div><div style="font-size:14px;color:var(--text-muted)">新しい問題を取り込みましょう</div></div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:12px;padding:12px;margin-bottom:14px;font-size:14px;font-weight:700;color:var(--primary)">
+      📌 ${list.length}問が未クリアです。理解できたら「クリア」にしよう！
+    </div>
+    ${list.map(p => `
+    <div class="review-card">
+      <div class="review-card-header">
+        <span>${p.subject} ／ ${p.title}</span>
+        <span style="opacity:0.8;font-size:12px">🔄 ${p.reviewCount}回目</span>
+      </div>
+      <div class="review-card-body">
+        ${p.image?`<img src="${p.image}" class="review-card-img" alt="">`:''}
+        <button class="answer-toggle" onclick="toggleAnswer(this)">💡 解説を見る</button>
+        <div class="answer-content">
+          ${p.explanation?`<div class="modal-explanation" style="margin-bottom:12px">${p.explanation}</div>`:''}
+          ${p.memo?`<div class="modal-memo" style="margin-bottom:12px">📝 ${p.memo}</div>`:''}
+        </div>
+        <div style="margin-bottom:10px">
+          <button class="btn btn-ghost btn-sm btn-full" onclick="generateQuiz(${p.id}, this)">🤖 AIが類似問題を出題</button>
+          <div class="quiz-box" id="quiz-${p.id}" style="display:none;margin-top:10px"></div>
+        </div>
+        <div class="review-buttons">
+          <button class="btn btn-ghost btn-sm" onclick="recordReview(${p.id})">🔄 もう一度</button>
+          <button class="btn btn-green btn-sm" onclick="markClearedReview(${p.id})">✅ わかった！クリア</button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+function toggleAnswer(btn) {
+  const c = btn.nextElementSibling;
+  c.classList.toggle('show');
+  btn.textContent = c.classList.contains('show') ? '🔼 解説を閉じる' : '💡 解説を見る';
+}
+
+function recordReview(id) {
+  const oldXP = calcXP();
+  const p = problems.find(x => x.id === id);
+  if (p) { p.reviewCount++; saveData(); checkBadges(oldXP); showToast('🔄 ふくしゅうを記録 +3 XP'); }
+}
+function markClearedReview(id) {
+  const oldXP = calcXP();
+  const p = problems.find(x => x.id === id);
+  if (p) { p.status='クリア'; p.reviewCount++; p.clearedAt=new Date().toISOString().split('T')[0]; saveData(); }
+  checkBadges(oldXP);
+  showToast('🎉 クリアおめでとう！ +20 XP');
+  renderReview();
+}
+
+async function generateQuiz(id, btn) {
+  const p = problems.find(x => x.id === id); if (!p) return;
+  const box = document.getElementById('quiz-' + id);
+  box.style.display = 'block';
+  box.innerHTML = '<div style="text-align:center;padding:16px"><div class="spinner" style="margin:0 auto 8px"></div><div style="font-size:13px;color:var(--text-muted)">AIが類似問題を生成中…</div></div>';
+  btn.disabled = true; btn.textContent = '⏳ 生成中…';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+        system: `小学5年生向けの類似問題を1問作成し、以下のJSONのみ返してください。他は不要。
+{"question":"問題文","options":["選択肢A","選択肢B","選択肢C","選択肢D"],"answer":0,"explanation":"解説"}
+answerは正解のindex（0〜3）`,
+        messages: [{role:'user', content:`この問題と同じ単元・難易度で類似問題を作ってください。\n教科：${p.subject}\nタイトル：${p.title}\n解説：${p.explanation}`}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(c => c.text||'').join('');
+    let q;
+    try { q = JSON.parse(text.replace(/```json|```/g,'').trim()); }
+    catch { box.innerHTML='<div style="color:var(--text-muted);font-size:13px;padding:12px">問題の生成に失敗しました</div>'; btn.disabled=false; btn.textContent='🤖 AIが類似問題を出題'; return; }
+    box.innerHTML = `
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;letter-spacing:1px">✦ AI生成 類似問題</div>
+      <div class="quiz-question">${q.question}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt,i) => `<button class="quiz-option" onclick="checkAnswer(this,${i},${q.answer},'${encodeURIComponent(q.explanation)}')">${String.fromCharCode(65+i)}. ${opt}</button>`).join('')}
+      </div>
+      <div class="quiz-result" id="qres-${id}"></div>`;
+    btn.textContent = '🤖 別の問題を出題';
+    btn.disabled = false;
+  } catch {
+    box.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:12px">生成に失敗しました</div>';
+    btn.disabled=false; btn.textContent='🤖 AIが類似問題を出題';
+  }
+}
+
+function checkAnswer(btn, chosen, correct, expEnc) {
+  const box = btn.closest('.review-card-body') || btn.closest('.quiz-box');
+  const opts = btn.parentElement.querySelectorAll('.quiz-option');
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === correct) o.classList.add('correct');
+    else if (i === chosen) o.classList.add('wrong');
+  });
+  const resId = btn.closest('.quiz-box').id.replace('quiz-', 'qres-');
+  const resEl = document.getElementById(resId);
+  if (resEl) {
+    const isCorrect = chosen === correct;
+    resEl.className = 'quiz-result show ' + (isCorrect ? 'correct-msg' : 'wrong-msg');
+    resEl.innerHTML = (isCorrect ? '🎉 正解！ ' : '❌ 不正解… 正解は ' + String.fromCharCode(65+correct) + '。') + '\n\n' + decodeURIComponent(expEnc);
+  }
+}
+
+// ══════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════
+function changeMonth(d) { calMonth.setMonth(calMonth.getMonth() + d); renderCalendar(); }
+
+function renderCalendar() {
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  document.getElementById('calTitle').textContent = y + '年' + (m+1) + '月';
+  const dayNames = ['日','月','火','水','木','金','土'];
+  document.getElementById('calHeader').innerHTML = dayNames.map(d =>
+    `<div class="cal-day-label" style="${d==='日'?'color:#f87171':d==='土'?'color:var(--accent)':''}">${d}</div>`).join('');
+  const first = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const daysInPrev = new Date(y, m, 0).getDate();
+  const today = new Date().toISOString().split('T')[0];
+  const wrongDates = new Set(problems.map(p => p.createdAt));
+  const clearedDates = new Set(problems.filter(p => p.clearedAt).map(p => p.clearedAt));
+  let cells = '';
+  for (let i = 0; i < first; i++) {
+    cells += `<div class="cal-cell other-month">${daysInPrev - first + 1 + i}</div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const hasW = wrongDates.has(dateStr), hasC = clearedDates.has(dateStr);
+    const cls = [hasW?'has-wrong':'', hasC&&!hasW?'has-cleared':'', dateStr===today?'today':''].filter(Boolean).join(' ');
+    cells += `<div class="cal-cell ${cls}" ${hasW?`onclick="showDayDetail('${dateStr}')"`:''}>${d}${hasW?'<div class="cal-dot"></div>':''}</div>`;
+  }
+  const remaining = 42 - first - daysInMonth;
+  for (let i = 1; i <= remaining; i++) cells += `<div class="cal-cell other-month">${i}</div>`;
+  document.getElementById('calGrid').innerHTML = cells;
+}
+
+function showDayDetail(date) {
+  const dayProblems = problems.filter(p => p.createdAt === date);
+  document.getElementById('calDayDetail').innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:12px">${date} の問題 (${dayProblems.length}問)</div>
+      ${dayProblems.map(p => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface2);border-radius:10px;margin-bottom:6px;cursor:pointer" onclick="openModal(${p.id})">
+          <span>${p.status==='クリア'?'✅':'⏳'}</span>
+          <div><div style="font-size:14px;font-weight:700">${p.title}</div><div style="font-size:12px;color:var(--text-muted)">${p.subject}</div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// REMINDER
+// ══════════════════════════════════════════
+function renderReminder() {
+  const pending = problems.filter(p => p.status !== 'クリア');
+  if (!pending.length) { document.getElementById('reminderSection').innerHTML = ''; return; }
+  const todayTarget = pending.slice(0, 3);
+  document.getElementById('reminderSection').innerHTML = `
+    <div class="reminder-box">
+      <div class="reminder-title">🔔 今日のふくしゅう目標（${todayTarget.length}問）</div>
+      ${todayTarget.map(p => `
+        <div class="reminder-problem" onclick="showScreen('review')">
+          ${p.image?`<img src="${p.image}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--border)" alt="">`:
+            `<div style="width:44px;height:44px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px">📝</div>`}
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700">${p.title}</div>
+            <div style="font-size:12px;color:var(--text-muted)">${p.subject} ／ 🔄 ${p.reviewCount}回</div>
+          </div>
+          <span style="color:var(--text-muted)">›</span>
+        </div>`).join('')}
+      <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="showScreen('review')">🚀 ふくしゅうをはじめる</button>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// STATS & BADGES
+// ══════════════════════════════════════════
+function renderStats() {
+  updateLevelUI();
+  const xp = calcXP(); const ld = getLevelData(xp);
+  document.getElementById('xpLabel').textContent = xp + ' / ' + ld.nextMin + ' XP';
+  document.getElementById('xpFill').style.width = ld.pct + '%';
+  const earned = JSON.parse(localStorage.getItem('mk_badges') || '[]');
+  document.getElementById('badgesGrid').innerHTML = BADGES.map(b => `
+    <div class="badge-item ${earned.includes(b.id)?'earned':''}">
+      <span class="badge-icon">${b.icon}</span>
+      <div class="badge-name">${b.name}</div>
+    </div>`).join('');
+  const total = problems.length, cleared = problems.filter(p => p.status==='クリア').length;
+  const reviews = problems.reduce((s,p) => s+(p.reviewCount||0), 0);
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat-box"><div class="stat-number">${total}</div><div class="stat-label">📋 合計問題数</div></div>
+    <div class="stat-box"><div class="stat-number" style="color:var(--green)">${cleared}</div><div class="stat-label">✅ クリア済み</div></div>
+    <div class="stat-box"><div class="stat-number" style="color:var(--yellow)">${total-cleared}</div><div class="stat-label">⏳ 未クリア</div></div>
+    <div class="stat-box"><div class="stat-number" style="color:var(--purple)">${reviews}</div><div class="stat-label">🔄 総ふくしゅう回数</div></div>`;
+  const subs = ['算数','国語','理科','社会','英語','その他'];
+  const counts = subs.map(s => problems.filter(p => p.subject===s).length);
+  const max = Math.max(...counts, 1);
+  document.getElementById('subjectBars').innerHTML = subs.map((s,i) => `
+    <div class="subject-bar">
+      <div class="subject-bar-label"><span>${s}</span><span>${counts[i]}問</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(counts[i]/max*100)}%"></div></div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// SYNC (Claude Storage API)
+// ══════════════════════════════════════════
+function generateCode() {
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function renderSync() {
+  if (!roomCode) { roomCode = generateCode(); localStorage.setItem('mk_room', roomCode); }
+  document.getElementById('roomCodeDisplay').textContent = roomCode;
+  document.getElementById('roomCodeInput').value = '';
+  document.getElementById('syncStatus').innerHTML = `
+    <div class="sync-banner">
+      <span>✅</span> ルームコード「${roomCode}」で同期中
+    </div>`;
+}
+
+async function syncToCloud() {
+  if (isSyncing || !roomCode) return;
+  isSyncing = true;
+  setSyncDot('syncing');
+  try {
+    const payload = JSON.stringify({problems, updatedAt: Date.now()});
+    await window.storage?.set('room:' + roomCode, payload, true);
+    setSyncDot('ok');
+  } catch { setSyncDot('error'); }
+  isSyncing = false;
+}
+
+async function syncFromCloud() {
+  if (!roomCode) return;
+  setSyncDot('syncing');
+  try {
+    const res = await window.storage?.get('room:' + roomCode, true);
+    if (res?.value) {
+      const remote = JSON.parse(res.value);
+      if (remote.updatedAt > (JSON.parse(localStorage.getItem('mk_lastSync')||'0'))) {
+        problems = remote.problems;
+        localStorage.setItem('mk_problems', JSON.stringify(problems));
+        localStorage.setItem('mk_lastSync', JSON.stringify(remote.updatedAt));
+        updateLevelUI();
+        showToast('☁️ クラウドから同期しました');
+      }
+    }
+    setSyncDot('ok');
+  } catch { setSyncDot('error'); }
+}
+
+async function syncNow() {
+  showToast('☁️ 同期中…');
+  await syncToCloud();
+  await syncFromCloud();
+  showToast('✅ 同期完了！');
+  renderSync();
+}
+
+function newRoom() {
+  if (!confirm('新しいルームコードを作成しますか？\n現在のコードは使えなくなります。')) return;
+  roomCode = generateCode();
+  localStorage.setItem('mk_room', roomCode);
+  renderSync();
+  showToast('🆕 新しいコードを作成しました');
+}
+
+async function joinRoom() {
+  const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+  if (code.length < 4) { showToast('❌ コードを入力してください'); return; }
+  roomCode = code;
+  localStorage.setItem('mk_room', roomCode);
+  showToast('🔗 参加中…');
+  await syncFromCloud();
+  renderSync();
+}
+
+function setSyncDot(state) {
+  const dot = document.getElementById('syncDot');
+  if (state === 'ok') { dot.style.background = 'var(--green)'; dot.style.boxShadow = '0 0 8px var(--green)'; }
+  else if (state === 'error') { dot.style.background = '#f87171'; dot.style.boxShadow = '0 0 8px #f87171'; }
+  else { dot.style.background = 'var(--yellow)'; dot.style.boxShadow = '0 0 8px var(--yellow)'; }
+}
+
+// Export / Import
+function exportData() {
+  const blob = new Blob([JSON.stringify({problems, roomCode, badges: JSON.parse(localStorage.getItem('mk_badges')||'[]')}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'machigai_note_backup.json'; a.click();
+  showToast('⬇️ エクスポートしました');
+}
+
+function importData(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.problems) {
+        problems = data.problems;
+        if (data.badges) localStorage.setItem('mk_badges', JSON.stringify(data.badges));
+        if (data.roomCode) { roomCode = data.roomCode; localStorage.setItem('mk_room', roomCode); }
+        saveData();
+        showToast('⬆️ インポートしました');
+        renderSync();
+      }
+    } catch { showToast('❌ ファイルが正しくありません'); }
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init
+renderReminder();
+if (roomCode) syncFromCloud();
+</script>
+</body>
+</html>
